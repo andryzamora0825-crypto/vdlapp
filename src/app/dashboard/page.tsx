@@ -1,7 +1,7 @@
 import DashboardFilters from "@/components/DashboardFilters"
 import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
-import { Trash2 } from "lucide-react"
+import { Trash2, FileText } from "lucide-react"
 import { auth, currentUser } from "@clerk/nextjs/server"
 
 async function deleteVoucher(formData: FormData) {
@@ -19,7 +19,6 @@ async function deleteVoucher(formData: FormData) {
     const voucher = await prisma.voucher.findUnique({ where: { id } });
     if (!voucher) return;
     
-    // Only allow deletion if user owns the voucher, or user is admin
     if (voucher.userId !== userId && !isAdmin) {
       return;
     }
@@ -33,14 +32,12 @@ async function deleteVoucher(formData: FormData) {
   }
 }
 
-// Function to fetch vouchers safely so it doesn't break if DB is down during local dev
 async function getVouchers(dateFilter?: string, filterMode?: string, searchQuery?: string, currentUserId?: string | null, isAdmin?: boolean) {
   try {
     let whereClause: any = {};
 
     const now = new Date();
     
-    // 1. Appending Search Query
     if (searchQuery) {
       whereClause.comprobante = {
         contains: searchQuery,
@@ -48,7 +45,6 @@ async function getVouchers(dateFilter?: string, filterMode?: string, searchQuery
       };
     }
 
-    // 2. Appending Date logic (handled separately but uses the same where object)
     let dateFilterClause;
     
     if (dateFilter) {
@@ -131,64 +127,109 @@ export default async function DashboardPage(props: {
   const vouchers = await getVouchers(dateStr, rawFilter, searchQuery, userId, isAdmin)
 
   return (
-    <main className="min-h-screen bg-gray-50/50 p-6 sm:p-12 font-sans">
-      <div className="max-w-5xl mx-auto space-y-8">
+    <main className="min-h-screen bg-[#0A0A0B] p-4 sm:p-8 font-sans">
+      <div className="max-w-5xl mx-auto space-y-6">
         
-        <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold text-gray-800 tracking-tight">Registro de Vouchers</h1>
+        <div className="flex items-center justify-between pt-2">
+          <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">Registro de Vouchers</h1>
         </div>
 
         <DashboardFilters />
 
-        <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-x-auto w-full">
-          <table className="w-full text-left border-collapse min-w-[800px]">
-            <thead>
-              <tr className="bg-gray-50/80 border-b border-gray-100 uppercase text-xs font-semibold text-gray-500 tracking-wider">
-                <th className="p-4">Fecha</th>
-                <th className="p-4">Comprobante</th>
-                <th className="p-4">Monto</th>
-                <th className="p-4">Estado</th>
-                <th className="p-4 text-right">Acciones</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100 text-sm text-gray-700">
-              {vouchers && vouchers.length > 0 ? (
-                vouchers.map((v: any) => (
-                  <tr key={v.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="p-4">{new Date(v.createdAt).toLocaleDateString("es-ES")}</td>
-                    <td className="p-4 font-mono">{v.comprobante}</td>
-                    <td className="p-4 font-medium text-emerald-600">{v.monto}</td>
-                    <td className="p-4">
-                      <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">
-                        Procesado
-                      </span>
-                    </td>
-                    <td className="p-4 text-right">
-                      <form action={deleteVoucher}>
-                        <input type="hidden" name="id" value={v.id} />
-                        <button type="submit" className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors inline-block" title="Eliminar registro">
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </form>
+        {/* Mobile: card list | Desktop: table */}
+        <div className="bg-[#111113] rounded-xl border border-white/10 shadow-xl overflow-hidden">
+          
+          {/* Desktop table — hidden on small screens */}
+          <div className="hidden sm:block overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="border-b border-white/5 bg-white/[0.02]">
+                  <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Fecha</th>
+                  <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Comprobante</th>
+                  <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Monto</th>
+                  <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Estado</th>
+                  <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Acciones</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/5 text-sm">
+                {vouchers && vouchers.length > 0 ? (
+                  vouchers.map((v: any) => (
+                    <tr key={v.id} className="hover:bg-white/[0.03] transition-colors">
+                      <td className="p-4 text-gray-300">{new Date(v.createdAt).toLocaleDateString("es-ES")}</td>
+                      <td className="p-4 font-mono text-gray-200">{v.comprobante}</td>
+                      <td className="p-4 font-medium text-emerald-400">{v.monto}</td>
+                      <td className="p-4">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                          Procesado
+                        </span>
+                      </td>
+                      <td className="p-4 text-right">
+                        <form action={deleteVoucher}>
+                          <input type="hidden" name="id" value={v.id} />
+                          <button type="submit" className="p-2 text-gray-600 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors inline-block" title="Eliminar registro">
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </form>
+                      </td>
+                    </tr>
+                  ))
+                ) : vouchers === null ? (
+                  <tr>
+                    <td colSpan={5} className="p-8 text-center text-red-400">
+                      <p className="font-medium">La base de datos aún no está configurada.</p>
+                      <p className="text-xs mt-1 text-gray-500">Conecta Supabase o revisa la inicialización de Prisma.</p>
                     </td>
                   </tr>
-                ))
-              ) : vouchers === null ? (
-                <tr>
-                  <td colSpan={5} className="p-8 text-center text-red-500">
-                    <p className="font-medium">La base de datos aún no está configurada.</p>
-                    <p className="text-xs mt-1">Conecta Supabase o revisa la inicialización de Prisma.</p>
-                  </td>
-                </tr>
-              ) : (
-                <tr>
-                  <td colSpan={5} className="p-8 text-center text-gray-400">
-                    No hay vouchers registrados en esta fecha.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                ) : (
+                  <tr>
+                    <td colSpan={5} className="p-8 text-center text-gray-500">
+                      No hay vouchers registrados en esta fecha.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Mobile: card list */}
+          <div className="sm:hidden divide-y divide-white/5">
+            {vouchers && vouchers.length > 0 ? (
+              vouchers.map((v: any) => (
+                <div key={v.id} className="p-4 flex items-start justify-between gap-3 hover:bg-white/[0.03] transition-colors">
+                  <div className="flex items-start gap-3 min-w-0">
+                    <div className="mt-0.5 p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex-shrink-0">
+                      <FileText className="w-4 h-4 text-emerald-400" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="font-mono text-sm font-semibold text-gray-100 truncate">{v.comprobante}</p>
+                      <p className="text-emerald-400 font-bold text-base mt-0.5">{v.monto}</p>
+                      <div className="flex items-center gap-2 mt-1.5">
+                        <span className="text-xs text-gray-500">{new Date(v.createdAt).toLocaleDateString("es-ES")}</span>
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                          Procesado
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <form action={deleteVoucher} className="flex-shrink-0">
+                    <input type="hidden" name="id" value={v.id} />
+                    <button type="submit" className="p-2 text-gray-600 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors" title="Eliminar">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </form>
+                </div>
+              ))
+            ) : vouchers === null ? (
+              <div className="p-8 text-center text-red-400">
+                <p className="font-medium">Base de datos no configurada.</p>
+              </div>
+            ) : (
+              <div className="p-8 text-center text-gray-500 text-sm">
+                No hay vouchers registrados.
+              </div>
+            )}
+          </div>
+
         </div>
 
       </div>
@@ -197,4 +238,3 @@ export default async function DashboardPage(props: {
 }
 
 export const dynamic = 'force-dynamic';
-

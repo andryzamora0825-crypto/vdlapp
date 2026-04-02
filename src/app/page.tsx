@@ -104,8 +104,8 @@ export default function Home() {
           </motion.div>
         </div>
       ) : (
-        <div className="relative z-10 flex flex-col items-center w-full max-w-5xl mx-auto">
-          <div className="text-center space-y-6 mb-16">
+        <div className="relative z-10 flex flex-col items-center w-full max-w-5xl mx-auto py-6 sm:py-10">
+          <div className="text-center space-y-4 mb-8 sm:mb-12 px-2">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-emerald-400 text-sm font-medium tracking-wide">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -114,11 +114,11 @@ export default function Home() {
               IA Activada
             </div>
             
-            <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-white">
+            <h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold tracking-tight text-white leading-tight">
               Sube tu Comprobante
             </h1>
             
-            <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto">
+            <p className="text-base sm:text-lg md:text-xl text-gray-400 max-w-2xl mx-auto">
               Sube tu recibo de pago y nuestra Inteligencia Artificial se encargará de extraer el monto y registrarlo.
             </p>
           </div>
