@@ -1,0 +1,16 @@
+{
+  "/_global-error/page": "/_global-error",
+  "/_not-found/page": "/_not-found",
+  "/admin/page": "/admin",
+  "/api/comparar-chat/route": "/api/comparar-chat",
+  "/api/nota-retiro/route": "/api/nota-retiro",
+  "/api/upload/route": "/api/upload",
+  "/comparar-chat/page": "/comparar-chat",
+  "/dashboard/page": "/dashboard",
+  "/favicon.ico/route": "/favicon.ico",
+  "/nota-retiro/page": "/nota-retiro",
+  "/page": "/",
+  "/profile/page": "/profile",
+  "/sign-in/[[...sign-in]]/page": "/sign-in/[[...sign-in]]",
+  "/sign-up/[[...sign-up]]/page": "/sign-up/[[...sign-up]]"
+}
