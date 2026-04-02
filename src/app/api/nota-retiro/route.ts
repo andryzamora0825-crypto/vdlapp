@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { OpenAI } from "openai";
 import { auth, currentUser } from "@clerk/nextjs/server";
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+export const dynamic = "force-dynamic";
+export const maxDuration = 60;
 
 export async function POST(request: Request) {
   try {
@@ -34,6 +35,7 @@ export async function POST(request: Request) {
     const base64Image = Buffer.from(bytes).toString("base64");
     const mimeType = file.type;
 
+    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
     const result = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [

@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { OpenAI } from "openai";
 import { prisma } from "@/lib/prisma";
+
+export const dynamic = "force-dynamic";
 import { auth, currentUser } from "@clerk/nextjs/server";
 
 export const maxDuration = 60;
