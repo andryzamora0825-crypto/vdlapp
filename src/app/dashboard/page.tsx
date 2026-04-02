@@ -101,7 +101,7 @@ async function getVouchers(dateFilter?: string, filterMode?: string, searchQuery
     const vouchers = await prisma.voucher.findMany({
       where: whereClause,
       orderBy: { createdAt: "desc" },
-      take: 20
+      take: 10000
     })
     return vouchers
   } catch (e) {
@@ -126,12 +126,27 @@ export default async function DashboardPage(props: {
 
   const vouchers = await getVouchers(dateStr, rawFilter, searchQuery, userId, isAdmin)
 
+  let totalSum = 0;
+  if (vouchers && vouchers.length > 0) {
+    totalSum = vouchers.reduce((acc: number, v: any) => {
+      const valStr = String(v.monto).replace(/[^\d.-]/g, '');
+      const val = parseFloat(valStr);
+      return acc + (isNaN(val) ? 0 : val);
+    }, 0);
+  }
+
   return (
     <main className="min-h-screen bg-[#0A0A0B] p-4 sm:p-8 font-sans">
       <div className="max-w-5xl mx-auto space-y-6">
         
-        <div className="flex items-center justify-between pt-2">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-2 gap-4">
           <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">Registro de Vouchers</h1>
+          {vouchers && vouchers.length > 0 && (
+            <div className="bg-[#111113] border border-white/10 rounded-xl px-4 py-3 flex items-center justify-between sm:justify-start gap-4 shadow-sm w-full sm:w-auto">
+              <span className="text-sm font-medium text-gray-400">Suma del periodo:</span>
+              <span className="text-xl font-bold text-emerald-400">${totalSum.toFixed(2)}</span>
+            </div>
+          )}
         </div>
 
         <DashboardFilters />
