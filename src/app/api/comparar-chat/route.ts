@@ -30,9 +30,9 @@ export async function POST(request: Request) {
       select: { comprobante: true, createdAt: true, monto: true },
     });
 
-    const registradosMap = new Map(registros.map(r => [r.comprobante, r]));
+    const registradosMap = new Map(registros.map((r: { comprobante: string; createdAt: Date; monto: string }) => [r.comprobante, r]));
 
-    const resultado = comprobantes.map(c => {
+    const resultado = comprobantes.map((c: string) => {
       const reg = registradosMap.get(c);
       return {
         comprobante: c,
@@ -42,8 +42,8 @@ export async function POST(request: Request) {
       };
     });
 
-    const faltantes = resultado.filter(r => !r.registrado).length;
-    const registrados = resultado.filter(r => r.registrado).length;
+    const faltantes = resultado.filter((r: { registrado: boolean }) => !r.registrado).length;
+    const registrados = resultado.filter((r: { registrado: boolean }) => r.registrado).length;
 
     return NextResponse.json({ resultado, total: comprobantes.length, registrados, faltantes });
   } catch (error: any) {
