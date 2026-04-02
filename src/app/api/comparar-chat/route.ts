@@ -30,7 +30,7 @@ export async function POST(request: Request) {
       select: { comprobante: true, createdAt: true, monto: true },
     });
 
-    const registradosMap = new Map(registros.map((r: { comprobante: string; createdAt: Date; monto: string }) => [r.comprobante, r]));
+    const registradosMap: Map<string, any> = new Map(registros.map((r: any) => [r.comprobante, r]));
 
     const resultado = comprobantes.map((c: string) => {
       const reg = registradosMap.get(c);
