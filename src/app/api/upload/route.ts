@@ -57,7 +57,7 @@ export async function POST(request: Request) {
   }
 
   // ── 4. OpenAI Vision ──────────────────────────────────────────────────────
-  const apiKey = process.env.OPENAI_API_KEY;
+  const apiKey = (process.env.OPENAI_API_KEY || "").trim();
   console.log("[UPLOAD] Step 4 - OPENAI_API_KEY presente:", !!apiKey, "| Primeros 10 chars:", apiKey?.substring(0, 10));
 
   let parsedData = { comprobante: "No encontrado", monto: "No encontrado" };

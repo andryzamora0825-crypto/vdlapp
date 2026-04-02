@@ -35,7 +35,7 @@ export async function POST(request: Request) {
     const base64Image = Buffer.from(bytes).toString("base64");
     const mimeType = file.type;
 
-    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    const openai = new OpenAI({ apiKey: (process.env.OPENAI_API_KEY || "").trim() });
     const result = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
