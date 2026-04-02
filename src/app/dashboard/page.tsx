@@ -2,13 +2,28 @@ import DashboardFilters from "@/components/DashboardFilters"
 import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
 import { Trash2 } from "lucide-react"
+import { auth, currentUser } from "@clerk/nextjs/server"
 
 async function deleteVoucher(formData: FormData) {
   "use server"
+  const { userId } = await auth();
+  const user = await currentUser();
+  const isAdmin = user?.primaryEmailAddress?.emailAddress === "andryzamora0825@gmail.com";
+
+  if (!userId) return;
+
   const id = formData.get("id") as string
   if (!id) return
   
   try {
+    const voucher = await prisma.voucher.findUnique({ where: { id } });
+    if (!voucher) return;
+    
+    // Only allow deletion if user owns the voucher, or user is admin
+    if (voucher.userId !== userId && !isAdmin) {
+      return;
+    }
+
     await prisma.voucher.delete({
       where: { id: id }
     })
@@ -19,7 +34,7 @@ async function deleteVoucher(formData: FormData) {
 }
 
 // Function to fetch vouchers safely so it doesn't break if DB is down during local dev
-async function getVouchers(dateFilter?: string, filterMode?: string, searchQuery?: string) {
+async function getVouchers(dateFilter?: string, filterMode?: string, searchQuery?: string, currentUserId?: string | null, isAdmin?: boolean) {
   try {
     let whereClause: any = {};
 
@@ -83,6 +98,10 @@ async function getVouchers(dateFilter?: string, filterMode?: string, searchQuery
       whereClause.createdAt = dateFilterClause;
     }
 
+    if (!isAdmin && currentUserId) {
+      whereClause.userId = currentUserId;
+    }
+
     const vouchers = await prisma.voucher.findMany({
       where: whereClause,
       orderBy: { createdAt: "desc" },
@@ -105,7 +124,11 @@ export default async function DashboardPage(props: {
   const dateStr = typeof resolveParams?.date === 'string' ? resolveParams.date : undefined;
   const searchQuery = typeof resolveParams?.q === 'string' ? resolveParams.q : undefined;
   
-  const vouchers = await getVouchers(dateStr, rawFilter, searchQuery)
+  const { userId } = await auth();
+  const user = await currentUser();
+  const isAdmin = user?.primaryEmailAddress?.emailAddress === "andryzamora0825@gmail.com";
+
+  const vouchers = await getVouchers(dateStr, rawFilter, searchQuery, userId, isAdmin)
 
   return (
     <main className="min-h-screen bg-gray-50/50 p-6 sm:p-12 font-sans">
