@@ -91,6 +91,7 @@ export async function POST(request: Request) {
         data: {
           comprobante: parsedData.comprobante,
           monto: parsedData.monto,
+          userId: userId,
         }
       });
       voucherId = voucherRecord.id;
