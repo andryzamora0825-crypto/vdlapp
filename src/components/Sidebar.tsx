@@ -2,11 +2,13 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, UploadCloud, UserCircle, ShieldAlert, FileText, MessageSquare } from 'lucide-react';
+import { useState } from 'react';
+import { LayoutDashboard, UploadCloud, UserCircle, ShieldAlert, FileText, MessageSquare, Menu, X } from 'lucide-react';
 import { useUser } from '@clerk/nextjs';
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const [isOpen, setIsOpen] = useState(false);
 
   const { user } = useUser();
   const currentEmail = user?.primaryEmailAddress?.emailAddress;
@@ -30,8 +32,23 @@ export default function Sidebar() {
   }
 
   return (
-    <aside className="w-64 h-screen bg-[#111113] border-r border-white/5 flex flex-col fixed left-0 top-0 z-50 shadow-2xl">
-      <div className="p-8">
+    <>
+      <button 
+        onClick={() => setIsOpen(!isOpen)}
+        className="md:hidden fixed top-4 left-4 z-[60] bg-[#111113] border border-white/10 text-white p-2 text-sm rounded-lg flex items-center justify-center shadow-lg"
+      >
+        {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+      </button>
+
+      {isOpen && (
+        <div 
+          className="md:hidden fixed inset-0 bg-black/60 z-40 backdrop-blur-sm"
+          onClick={() => setIsOpen(false)}
+        />
+      )}
+
+      <aside className={`w-64 h-screen bg-[#111113] border-r border-white/5 flex flex-col fixed left-0 top-0 z-50 shadow-2xl transition-transform duration-300 md:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="p-8 pt-16 md:pt-8">
         <h2 className="text-2xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-indigo-500 tracking-tight">
           VDL Vouchers
         </h2>
@@ -75,5 +92,6 @@ export default function Sidebar() {
         </div>
       </div>
     </aside>
+    </>
   );
 }

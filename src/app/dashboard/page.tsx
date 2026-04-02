@@ -140,8 +140,8 @@ export default async function DashboardPage(props: {
 
         <DashboardFilters />
 
-        <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
-          <table className="w-full text-left border-collapse">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-x-auto w-full">
+          <table className="w-full text-left border-collapse min-w-[800px]">
             <thead>
               <tr className="bg-gray-50/80 border-b border-gray-100 uppercase text-xs font-semibold text-gray-500 tracking-wider">
                 <th className="p-4">Fecha</th>
