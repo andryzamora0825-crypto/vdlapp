@@ -3,6 +3,9 @@ import { OpenAI } from "openai";
 import { prisma } from "@/lib/prisma";
 import { auth, currentUser } from "@clerk/nextjs/server";
 
+export const maxDuration = 60; // Extiende el límite de tiempo de Vercel de 10s a 60s
+
+
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
